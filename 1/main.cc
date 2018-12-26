@@ -1,8 +1,13 @@
+// Advent of Code #1.
+//
+// Expect problem input from standard input.
+
 #include <cstdio>
 #include <iostream>
 #include <istream>
 #include <string>
 
+// Read next value from input stream.
 int ReadValue(std::istream *istream) {
   int multiplier = 1;
   int value = 0;
@@ -34,7 +39,7 @@ int main(int argc, char *argv[]) {
   std::string in;
 
   int total = 0;
-  
+
   while (std::cin.peek() != EOF) {
     total += ReadValue(&std::cin);
   }
