@@ -20,6 +20,7 @@ struct Point {
 };
 
 struct Rect {
+  int id;
   Point point;
   Dimensions dimensions;
 
@@ -43,7 +44,7 @@ struct Rect {
     int height = std::max(bottom - top, 0);
     Dimensions dim{width, height};
 
-    return Rect{point, dim};
+    return Rect{-1, point, dim};
   }
 
   int size() const {
@@ -89,8 +90,20 @@ const struct Point ExtractPoint(const std::string &rect_str) {
   return point;
 }
 
+int ExtractId(const std::string& rect_str) {
+  std::regex id_regex(R"re(#(\d+))re");
+  std::smatch match;
+  if (!std::regex_search(rect_str, match, id_regex)) {
+    std::cerr << "could not parse ID: " << rect_str << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  return std::stoi(match[1]);
+}
+
 const struct Rect ParseRect(const std::string &rect_str) {
   Rect rect;
+  rect.id = ExtractId(rect_str);
   rect.dimensions = ExtractDimensions(rect_str);
   rect.point = ExtractPoint(rect_str);
   return rect;
@@ -152,14 +165,20 @@ int main(int argc, char *argv[]) {
 
       Point point{x, y};
       Dimensions dim {1, 1};
-      const Rect sq_rect{point, dim};
+      const Rect sq_rect{-1, point, dim};
 
       if (CountRectsIntersectingRect(rects, sq_rect) >= 2) {
         count++;
       }
     }
   }
-  
 
-  std::cout << count << std::endl;
+  printf("Total count of squares with >=2 intersections: %d\n", count);
+
+  for (const auto& rect : rects) {
+    // 1 because the rect will intersect with itself.
+    if (CountRectsIntersectingRect(rects, rect) == 1) {
+      printf("Rect #%d does not intersect any others\n", rect.id);
+    }
+  }
 }
